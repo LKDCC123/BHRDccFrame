@@ -1,8 +1,4 @@
 #include "Crep_DataExchange.h"
-#include "BHR7P1_Run_Team_7P2_cmake_multithread\lib\Tra_Generate.h"
-//#include "BHR7P1_Run_Team_V3.0\lib\DCC_RunCon.h"
-
-#include "BHR7P1_Run_Team_7P2_cmake_multithread/ChzFrame/ChzFrameCpp2C.h"
 
 double XS_Pitch, XS_Roll, XS_Yaw;
 double XS_AccX, XS_AccY, XS_AccZ;
