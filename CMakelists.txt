@@ -1,0 +1,66 @@
+cmake_minimum_required(VERSION 3.0)
+project(7P2_Robot_Sim)
+
+include_directories( # 库头文件
+    "C:/Program Files/V-REP3/V-REP_PRO_EDU/programming/remoteApiBindings/lib/x64/Release"
+    "C:/Program Files/CoppeliaRobotics/CoppeliaSimEdu/programming/common"
+    "C:/Program Files/CoppeliaRobotics/CoppeliaSimEdu/programming/include"
+    "C:/Program Files/CoppeliaRobotics/CoppeliaSimEdu/programming/remoteApi"
+    "RunTeamLib"
+    "RunTeamLib/EigenQP"
+    "RunTeamLib/Eigen"
+    "BHR7P1_Run_Team_7P2_cmake_multithread"
+)
+
+#link_directories( # 库文件，没用这个
+#    "C:/Program Files/V-REP3/V-REP_PRO_EDU/programming/remoteApiBindings/lib/x64/Release"
+#    "C:/Program Files/CoppeliaRobotics/CoppeliaSimEdu/programming/common"
+#    "C:/Program Files/CoppeliaRobotics/CoppeliaSimEdu/programming/include"
+#    "C:/Program Files/CoppeliaRobotics/CoppeliaSimEdu/programming/remoteApi"
+#)
+
+aux_source_directory("CRemotelib" Dir_Sim)
+aux_source_directory("C:/Program Files/CoppeliaRobotics/CoppeliaSimEdu/programming/remoteApi" Dir_Sim) # 仿真直接用的这个源文件
+aux_source_directory("RunTeamLib/EigenQP" Dir_Eigen)
+aux_source_directory("RunTeamLib/Eigen" Dir_Eigen)
+aux_source_directory("BHR7P1_Run_Team_7P2_cmake_multithread/ChzFrame/BHR7P1_Inv" Dir_ChzFm)
+aux_source_directory("BHR7P1_Run_Team_7P2_cmake_multithread/ChzFrame/CTRL" Dir_ChzFm)
+aux_source_directory("BHR7P1_Run_Team_7P2_cmake_multithread/ChzFrame/CTRL/Chz_Control_lib" Dir_ChzFm)
+aux_source_directory("BHR7P1_Run_Team_7P2_cmake_multithread/ChzFrame/CTRL/Chz_online" Dir_ChzFm)
+aux_source_directory("BHR7P1_Run_Team_7P2_cmake_multithread/ChzFrame/CTRL/DccCon_lib" Dir_ChzFm)
+aux_source_directory("BHR7P1_Run_Team_7P2_cmake_multithread/ChzFrame/CTRL/LCC_lib" Dir_ChzFm)
+aux_source_directory("BHR7P1_Run_Team_7P2_cmake_multithread/ChzFrame/CTRL/LDTPC_lib" Dir_ChzFm)
+aux_source_directory("BHR7P1_Run_Team_7P2_cmake_multithread/ChzFrame/CTRL/LJointDelayCompensation_Lib" Dir_ChzFm)
+aux_source_directory("BHR7P1_Run_Team_7P2_cmake_multithread/ChzFrame/CTRL/QP_Moment_Control" Dir_ChzFm)
+aux_source_directory("BHR7P1_Run_Team_7P2_cmake_multithread/ChzFrame/PG" Dir_ChzFm)
+aux_source_directory("BHR7P1_Run_Team_7P2_cmake_multithread/ChzFrame/PG/DCC_Walk/" Dir_ChzFm)
+aux_source_directory("BHR7P1_Run_Team_7P2_cmake_multithread/ChzFrame/PG/DCC_Walk/MPC_unconstrained_coder_forPG" Dir_ChzFm)
+aux_source_directory("BHR7P1_Run_Team_7P2_cmake_multithread/ChzFrame/SDFAST" Dir_ChzFm)
+aux_source_directory("BHR7P1_Run_Team_7P2_cmake_multithread/Dcc_lib" Dir_DccLib)
+aux_source_directory("BHR7P1_Run_Team_7P2_cmake_multithread/Dcc_lib/Base" Dir_DccLib)
+aux_source_directory("BHR7P1_Run_Team_7P2_cmake_multithread/lib" Dir_Lib)
+list(REMOVE_ITEM Dir_Lib # 把不要的去了！这俩工控机上才用呢
+    "BHR7P1_Run_Team_7P2_cmake_multithread/lib/DCC_Run_ReadConfig.cpp"
+    "BHR7P1_Run_Team_7P2_cmake_multithread/lib/hardware_conf.c"
+    )
+list(REMOVE_ITEM Dir_ChzFm # .m 文件，去掉去掉！
+    "BHR7P1_Run_Team_7P2_cmake_multithread/ChzFrame/PG/DCC_Walk/MPC_unconstrained_coder_forPG/cal_com.m"
+    "BHR7P1_Run_Team_7P2_cmake_multithread/ChzFrame/PG/DCC_Walk/MPC_unconstrained_coder_forPG/cal_zmp.m"
+    "BHR7P1_Run_Team_7P2_cmake_multithread/ChzFrame/PG/DCC_Walk/MPC_unconstrained_coder_forPG/Generator.m"
+    "BHR7P1_Run_Team_7P2_cmake_multithread/ChzFrame/PG/DCC_Walk/MPC_unconstrained_coder_forPG/mpc_cal_Hg.m"
+    "BHR7P1_Run_Team_7P2_cmake_multithread/ChzFrame/PG/DCC_Walk/MPC_unconstrained_coder_forPG/mpc_controller.m"
+    "BHR7P1_Run_Team_7P2_cmake_multithread/ChzFrame/PG/DCC_Walk/MPC_unconstrained_coder_forPG/MPC_controller_writefun.m"
+    )
+add_executable(Sim_process Crep_DataExchange.c 
+    BHR7P1_Run_Team_7P2_cmake_multithread/ChzFrame/ChzFrameCpp2C.cpp
+    BHR7P1_Run_Team_7P2_cmake_multithread/ChzFrame/ChzFrameLogger.cpp
+    BHR7P1_Run_Team_7P2_cmake_multithread/ChzFrame/ChzFrameSaveLog.cpp
+    BHR7P1_Run_Team_7P2_cmake_multithread/ChzFrame/ChzFrameSwitch.cpp
+    BHR7P1_Run_Team_7P2_cmake_multithread/ChzFrame/FullDoFIK.cpp
+    BHR7P1_Run_Team_7P2_cmake_multithread/ChzFrame/RobotState.cpp
+    ${Dir_Sim} ${Dir_Eigen} ${Dir_ChzFm} ${Dir_DccLib} ${Dir_Lib}
+)
+
+target_compile_definitions(Sim_process PUBLIC -DMAX_EXT_API_CONNECTIONS=255 -DNON_MATLAB_PARSING -DDO_NOT_USE_SHARED_MEMORY -D_CRT_SECURE_NO_WARNINGS)
+target_compile_options(Sim_process PUBLIC /nologo /Ox /O2 /Og /Ot /W3 /WX- /Gm- /EHsc /MT /GS- /fp:precise /Zc:wchar_t /Zc:forScope /Zc:inline /GR- /Gd /openmp- /Gd /analyze- /errorReport:prompt /openmp-)
+# target_link_libraries(Sim_process PUBLIC remoteApi.dll remoteApiSharedLib-64.lib) # 没用库
